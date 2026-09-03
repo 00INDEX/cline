@@ -152,14 +152,19 @@ export const ChatRowContent = memo(
 		retryFailedRequest,
 	}: ChatRowContentProps) => {
 		const {
-			backgroundEditEnabled,
+			backgroundEditEnabled: backgroundEditSetting,
 			mcpServers,
 			vscodeTerminalExecutionMode,
 			clineMessages,
 			showFeatureTips,
-			enableCheckpointsSetting,
+			enableCheckpointsSetting: checkpointsSetting,
 			turnState,
+			currentCloudTask,
 		} = useExtensionState()
+		// Cloud tasks edit files inside the sandbox: there is no local editor to
+		// preview in, so diffs render inline, and no local workspace to checkpoint.
+		const backgroundEditEnabled = backgroundEditSetting || !!currentCloudTask
+		const enableCheckpointsSetting = checkpointsSetting && !currentCloudTask
 		const [quoteButtonState, setQuoteButtonState] = useState<QuoteButtonState>({
 			visible: false,
 			top: 0,
@@ -915,7 +920,7 @@ export const ChatRowContent = memo(
 								messageTs={message.ts}
 								sendMessageFromChatRow={sendMessageFromChatRow}
 								text={message.text}
-								canRestoreWorkspace={canRestoreWorkspaceFromMessage(clineMessages, message.ts)}
+								canRestoreWorkspace={!currentCloudTask && canRestoreWorkspaceFromMessage(clineMessages, message.ts)}
 							/>
 						)
 					case "user_feedback_diff":
