@@ -1018,6 +1018,12 @@ export class Controller {
 	 * system prompt, for standalone utility requests (commit message generation)
 	 * that don't run through a session. Empty when no rule is enabled or the
 	 * rules can't be read — a utility request should still go out without them.
+	 *
+	 * "Enabled" means what the SDK means by it: the rule file has no
+	 * `disabled: true` frontmatter. The Rules panel's on/off toggles are stored
+	 * in extension state that the SDK does not read (CLINE-3120), so a rule
+	 * switched off there is still sent here — exactly as it is still sent to
+	 * chat. Fixing that in one place fixes both.
 	 */
 	async getRulesForSystemPrompt(): Promise<string> {
 		if (this.isDisposed) {
