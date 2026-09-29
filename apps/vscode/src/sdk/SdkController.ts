@@ -13,7 +13,9 @@ import {
 	ensureChatWorkspace,
 	findCheckpointForRun,
 	getProviderAuthStorageId,
+	loadRulesForSystemPromptFromRecords,
 	type PreparedRemoteConfigCoreIntegration,
+	type RuleConfig,
 	readSessionCheckpointHistory,
 	resolveDefaultMcpSettingsPath,
 	type SessionHistoryRecord,
@@ -105,7 +107,6 @@ import { StatePostDebouncer } from "./state-post-debouncer"
 import { createTaskProxy, type TaskProxy } from "./task-proxy"
 import { syncTelemetrySettingFromSharedGlobalSettings } from "./telemetry-settings-sync"
 import { TurnStateTracker } from "./turn-state-tracker"
-import { renderEnabledRulesForSystemPrompt } from "./user-instruction-rules"
 import { createWorkspaceFileReadExecutor } from "./vscode-file-read-executor"
 import { VscodeSessionHost } from "./vscode-session-host"
 import type { VscodeTerminalExecutionMode } from "./vscode-terminal-execution-mode"
@@ -1025,7 +1026,7 @@ export class Controller {
 		try {
 			const workspaceRoot = await this.getWorkspaceRoot()
 			const service = await this.ensureUserInstructionService(workspaceRoot)
-			return renderEnabledRulesForSystemPrompt(service)
+			return loadRulesForSystemPromptFromRecords(service.listRecords<RuleConfig>("rule"))
 		} catch (error) {
 			Logger.warn("[SdkController] Failed to load rules for system prompt:", error)
 			return ""
